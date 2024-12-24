@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastermind Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .game-container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .peg {
+            width: 40px;
+            height: 40px;
+            margin: 5px;
+            border-radius: 50%;
+            background-color: lightgray;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+
+        .feedback {
+            display: flex;
+            justify-content: center;
+            margin-left: 10px;
+        }
+
+        .feedback .dot {
+            width: 15px;
+            height: 15px;
+            margin: 3px;
+            border-radius: 50%;
+            background-color: gray;
+            border: 1px solid #000; /* Added border for better visibility */
+        }
+
+        .controls {
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Mastermind</h1>
+        <div id="board"></div>
+        <div class="controls">
+            <button class="btn" id="submitGuess">Submit Guess</button>
+            <button class="btn" id="restartGame">Restart Game</button>
+        </div>
+    </div>
+
+    <script>
+        // Constants
+        const COLORS = ['red', 'blue', 'green', 'yellow', 'orange', 'purple'];
+        const CODE_LENGTH = 4;
+
+        // State
+        let secretCode = [];
+        let currentGuess = [];
+        let attempts = [];
+
+        // DOM Elements
+        const board = document.getElementById('board');
+        const submitGuessButton = document.getElementById('submitGuess');
+        const restartGameButton = document.getElementById('restartGame');
+		
+		
+
+        // Initialize Game
+        function startGame() {
+            secretCode = generateSecretCode();
+            currentGuess = [];
+            attempts = [];
+            board.innerHTML = '';
+            addNewRow();
+            console.log('Secret Code:', secretCode); // For debugging
+        }
+
+        function generateSecretCode() {
+            const shuffledColors = [...COLORS].sort(() => 0.5 - Math.random());
+            return shuffledColors.slice(0, CODE_LENGTH);
+        }
+
+        function addNewRow() {
+            const row = document.createElement('div');
+            row.classList.add('row');
+
+            for (let i = 0; i < CODE_LENGTH; i++) {
+                const peg = document.createElement('div');
+                peg.classList.add('peg');
+                peg.addEventListener('click', () => cycleColor(peg));
+                row.appendChild(peg);
+            }
+
+            const feedback = document.createElement('div');
+            feedback.classList.add('feedback');
+            for (let i = 0; i < CODE_LENGTH; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                feedback.appendChild(dot);
+            }
+            row.appendChild(feedback);
+
+            board.appendChild(row);
+        }
+
+        function cycleColor(peg) {
+            const currentColor = peg.style.backgroundColor;
+            const currentIndex = COLORS.indexOf(currentColor);
+            const nextIndex = (currentIndex + 1) % COLORS.length;
+            peg.style.backgroundColor = COLORS[nextIndex];
+        }
+
+        function getCurrentGuess() {
+            const row = board.lastElementChild;
+            return Array.from(row.getElementsByClassName('peg')).map(peg => peg.style.backgroundColor);
+        }
+
+        function provideFeedback(guess) {
+            const feedback = [];
+            const codeCopy = [...secretCode];
+
+            // Check for correct color and position
+            guess.forEach((color, index) => {
+                if (color === codeCopy[index]) {
+                    feedback.push('black');
+                    codeCopy[index] = null; // Mark as matched
+                    guess[index] = null; // Mark as matched
+                }
+            });
+
+            // Check for correct color only
+            guess.forEach(color => {
+                if (color && codeCopy.includes(color)) {
+                    feedback.push('white');
+                    codeCopy[codeCopy.indexOf(color)] = null; // Mark as matched
+                }
+            });
+
+            return feedback;
+        }
+
+        function updateFeedback(feedback) {
+            const row = board.lastElementChild;
+            const dots = row.querySelectorAll('.dot');
+
+            feedback.forEach((color, index) => {
+                dots[index].style.backgroundColor = color;
+            });
+        }
+
+        function checkWin(feedback) {
+            return feedback.length === CODE_LENGTH && feedback.every(color => color === 'black');
+        }
+
+        submitGuessButton.addEventListener('click', () => {
+            const guess = getCurrentGuess();
+            if (guess.includes('')) {
+                alert('Please complete your guess.');
+                return;
+            }
+
+            if (new Set(guess).size !== guess.length) {
+                alert('Duplicate colors are not allowed.');
+                return;
+            }
+
+            const feedback = provideFeedback([...guess]);
+            updateFeedback(feedback);
+            attempts.push({ guess, feedback });
+
+            if (checkWin(feedback)) {
+                alert('Congratulations! You cracked the code!');
+            } else if (attempts.length >= 10) {
+                alert(`Game over! The secret code was: ${secretCode.join(', ')}`);
+            } else {
+                addNewRow();
+            }
+        });
+
+        restartGameButton.addEventListener('click', startGame);
+
+        // Start the game on load
+        startGame();
+    </script>
+</body>
+</html>
