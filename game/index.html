@@ -74,7 +74,7 @@
 </head>
 <body>
     <div class="game-container">
-        <h1>Mastermind</h1>
+        <h1>Fetr Betr</h1>
         <div id="board"></div>
         <div class="controls">
             <button class="btn" id="submitGuess">Submit Guess</button>
@@ -2332,6 +2332,25 @@
 
             board.appendChild(row);
         }
+		
+		function PrintAnsw(inptxt) {
+            const row = document.createElement('div');
+            row.classList.add('row');
+
+
+            for (let i = 0; i < CODE_LENGTH; i++) {
+                const peg = document.createElement('div');
+                peg.classList.add('peg');
+                peg.style.backgroundColor=getTodayCode()[i];
+                row.appendChild(peg);
+            }
+			board.appendChild(row);
+			
+			const txt2 = document.createElement('pre');
+			txt2.classList.add('text');
+			txt2.textContent = inptxt; // Corrected from txt.text
+			board.appendChild(txt2);
+        }
 
         function cycleColor(peg) {
             const currentColor = peg.style.backgroundColor;
@@ -2400,9 +2419,49 @@
             attempts.push({ guess, feedback });
 
             if (checkWin(feedback)) {
-                alert('Congratulations! You cracked the code!');
+				g="";
+				for (let i = 0; i < attempts.length; i++) {
+						s="";
+						for (let j = 0; j < attempts[i].feedback.length; j++) {
+							if (attempts[i].feedback[j]=="black"){
+								s+="⚫";
+							}
+							else{
+								s+="⚪";
+							}
+						}
+				s+="\n";
+				g+=s;
+				}
+				PrintAnsw("Congratulations! You cracked the code!\n"+attempts.length+"/10\n"+g);
+				g=(attempts.length+"/10\n"+g);
+				navigator.clipboard.writeText(g) // Copy to clipboard
+				  .then(() => {
+					alert("Game Copied to clipboard!");
+				  })
+                
             } else if (attempts.length >= 10) {
-                alert(`Game over! The secret code was: ${secretCode.join(', ')}`);
+				g="";
+				for (let i = 0; i < attempts.length; i++) {
+						s="";
+						for (let j = 0; j < attempts[i].feedback.length; j++) {
+							if (attempts[i].feedback[j]=="black"){
+								s+="⚫";
+							}
+							else{
+								s+="⚪";
+							}
+						}
+				s+="\n";
+				g+=s;
+				}
+				PrintAnsw("Game Over!\nX/10 \n"+g);
+				g=("X/10\n"+g);
+				navigator.clipboard.writeText(g) // Copy to clipboard
+				  .then(() => {
+					alert("Game Copied to clipboard!");
+				  })
+                
             } else {
                 addNewRow();
             }
@@ -2411,9 +2470,10 @@
         restartGameButton.addEventListener('click', startGame);
 
 		console.log(secretCodes);
-
+		
         // Start the game on load
         startGame();
+		
 		
 		
 		
