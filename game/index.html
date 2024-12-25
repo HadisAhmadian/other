@@ -74,11 +74,12 @@
 </head>
 <body>
     <div class="game-container">
-        <h1>Fetr Betr</h1>
+        <h1 style="line-height: 0.2;font-family: 'Caveat', cursive;">FETL e BETL</h1>
+		<h1 style="font-size: 20px; font-weight: normal;font-family: 'Caveat', cursive;">(Fetr Betr, only better)</h1>
         <div id="board"></div>
         <div class="controls">
-            <button class="btn" id="submitGuess">Submit Guess</button>
-            <button class="btn" id="restartGame">Restart Game</button>
+            <button class="btn" id="submitGuess" style="font-family: 'Caveat', cursive;">Submit Guess</button>
+            <button class="btn" id="restartGame" style="font-family: 'Caveat', cursive;">Restart Game</button>
         </div>
     </div>
 
@@ -2435,9 +2436,13 @@
 				}
 				PrintAnsw("Congratulations! You cracked the code!\n"+attempts.length+"/10\n"+g);
 				g=(attempts.length+"/10\n"+g);
-				navigator.clipboard.writeText(g) // Copy to clipboard
+				const today = new Date();
+				const dateStr = today.toLocaleDateString();
+				d="#FetlBetl, "+dateStr;
+				
+				navigator.clipboard.writeText(d+"\n"+g) // Copy to clipboard
 				  .then(() => {
-					alert("Game Copied to clipboard!");
+					alert("Game Copied to clipboard!\n"+g);
 				  })
                 
             } else if (attempts.length >= 10) {
@@ -2457,9 +2462,13 @@
 				}
 				PrintAnsw("Game Over!\nX/10 \n"+g);
 				g=("X/10\n"+g);
-				navigator.clipboard.writeText(g) // Copy to clipboard
+				const today = new Date();
+				const dateStr = today.toLocaleDateString();
+				d="#FetlBetl, "+dateStr;
+				
+				navigator.clipboard.writeText(d+"\n"+g) // Copy to clipboard
 				  .then(() => {
-					alert("Game Copied to clipboard!");
+					alert("Game Copied to clipboard!"+g);
 				  })
                 
             } else {
