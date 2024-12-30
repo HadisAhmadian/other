@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بازی حدس عدد</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    input {
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>بازی حدس عدد</h1>
+  <p>یک عدد بین ۱ تا ۱۰۰ انتخاب شده است. آیا می‌توانید حدس بزنید؟</p>
+  <input type="number" id="guess" placeholder="حدس شما">
+  <button onclick="checkGuess()">حدس بزن</button>
+  <div id="message"></div>
+
+  <script>
+    // انتخاب یک عدد تصادفی بین ۱ تا ۱۰۰
+    const randomNumber = Math.floor(Math.random() * 100) + 1;
+    let attempts = 0;
+
+    function checkGuess() {
+      const guess = parseInt(document.getElementById('guess').value);
+      attempts++;
+
+      if (guess === randomNumber) {
+        document.getElementById('message').innerHTML = `تبریک! عدد ${randomNumber} درست است. شما در ${attempts} تلاش موفق شدید.`;
+      } else if (guess < randomNumber) {
+        document.getElementById('message').innerHTML = 'عدد بزرگ‌تر است!';
+      } else {
+        document.getElementById('message').innerHTML = 'عدد کوچک‌تر است!';
+      }
+    }
+  </script>
+</body>
+</html>
