@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>بازی با جاذبه</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            touch-action: manipulation;
+        }
+        
+        #gameCanvas {
+            border: 2px solid #333;
+            background-color: #fff;
+            margin: 20px;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            gap: 10px;
+        }
+        
+        button {
+            padding: 15px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            touch-action: manipulation;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="300" height="400"></canvas>
+    <div class="controls">
+        <button id="leftBtn">◀</button>
+        <button id="upBtn">▲</button>
+        <button id="rightBtn">▶</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // تنظیمات کاراکتر
+        const player = {
+            x: 150,
+            y: 100,
+            width: 30,
+            height: 30,
+            speedX: 0,
+            speedY: 0,
+            grounded: false
+        };
+        
+        // تنظیمات فیزیک
+        const gravity = 0.5;
+        const friction = 0.8;
+        const moveSpeed = 5;
+        const jumpForce = -12;
+        
+        // وضعیت دکمه‌ها
+        const keys = {
+            left: false,
+            right: false,
+            up: false
+        };
+        
+        // رویدادهای دکمه‌ها
+        document.getElementById('leftBtn').addEventListener('touchstart', () => keys.left = true);
+        document.getElementById('leftBtn').addEventListener('touchend', () => keys.left = false);
+        document.getElementById('leftBtn').addEventListener('mousedown', () => keys.left = true);
+        document.getElementById('leftBtn').addEventListener('mouseup', () => keys.left = false);
+        
+        document.getElementById('rightBtn').addEventListener('touchstart', () => keys.right = true);
+        document.getElementById('rightBtn').addEventListener('touchend', () => keys.right = false);
+        document.getElementById('rightBtn').addEventListener('mousedown', () => keys.right = true);
+        document.getElementById('rightBtn').addEventListener('mouseup', () => keys.right = false);
+        
+        document.getElementById('upBtn').addEventListener('touchstart', jump);
+        document.getElementById('upBtn').addEventListener('touchend', () => keys.up = false);
+        document.getElementById('upBtn').addEventListener('mousedown', jump);
+        document.getElementById('upBtn').addEventListener('mouseup', () => keys.up = false);
+        
+        function jump() {
+            if (player.grounded) {
+                player.speedY = jumpForce;
+                player.grounded = false;
+            }
+        }
+        
+        function update() {
+            // اعمال جاذبه
+            player.speedY += gravity;
+            
+            // حرکت افقی
+            if (keys.left) player.speedX = -moveSpeed;
+            else if (keys.right) player.speedX = moveSpeed;
+            else player.speedX *= friction;
+            
+            // آپدیت موقعیت
+            player.x += player.speedX;
+            player.y += player.speedY;
+            
+            // تشخیص برخورد با زمین
+            if (player.y + player.height > canvas.height) {
+                player.y = canvas.height - player.height;
+                player.speedY = 0;
+                player.grounded = true;
+            } else {
+                player.grounded = false;
+            }
+            
+            // محدودیت حرکتی در حاشیه‌ها
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+        }
+        
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // رسم زمین
+            ctx.fillStyle = '#666';
+            ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
+            
+            // رسم کاراکتر
+            ctx.fillStyle = '#f00';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
+        
+        function animate() {
+            update();
+            draw();
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+    </script>
+</body>
+</html>
